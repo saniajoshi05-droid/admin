@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<h2>Admin log in</h2>
+<form action="/login" method="post" class="narrow">
+  <label for="username">Username</label>
+  <input id="username" type="text" name="username" autocomplete="username">
+  <label for="password">Password</label>
+  <input id="password" type="password" name="password" autocomplete="current-password">
+  <button type="submit">Log in</button>
+</form>
+{% endblock %}
+

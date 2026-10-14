@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ store_name }} Admin{% endblock %}</title>
+<link rel="stylesheet" href="/static/css/pico.amber.min.css">
+<link rel="stylesheet" href="/static/css/main.css">
+<style>
+  :root {
+    --brand: {{ primary_color }};
+    --brand-text: {{ primary_text }};
+    --pico-primary-background: {{ accent_color }};
+    --pico-primary-hover-background: {{ accent_color }};
+    --pico-primary-inverse: {{ accent_text }};
+  }
+</style>
+</head>
+<body>
+<header class="container-fluid brand-bar">
+  <nav class="container">
+    <ul>
+      <li><h1><a href="/">{{ store_name }} Admin</a></h1></li>
+    </ul>
+    {% if current_admin %}
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/products">Products</a></li>
+      <li><a href="/users">Customers</a></li>
+      <li><a href="/search">Search</a></li>
+      <li><a href="/logout">Log out ({{ current_admin }})</a></li>
+    </ul>
+    {% endif %}
+  </nav>
+</header>
+
+<main class="container">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="container">
+  <small>{{ store_name }} Admin dashboard, for internal only</small>
+</footer>
+</body>
+</html>
+

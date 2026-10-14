@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Search customers</h2>
+<form action="/search" method="get" class="narrow">
+  <label for="q">Name, email, or address</label>
+  <input id="q" type="text" name="q" value="{{ query }}">
+  <button type="submit">Search</button>
+</form>
+{% if query %}
+<h2>Results for "{{ query }}"</h2>
+{% if results %}
+<table>
+  <thead>
+    <tr><th>Username</th><th>Email</th><th>Address</th><th>Balance</th></tr>
+  </thead>
+  <tbody>
+    {% for row in results %}
+    <tr>
+      <td><a href="/users/{{ row.username }}">{{ row.username }}</a></td>
+      <td>{{ row.email }}</td>
+      <td>{{ row.address }}</td>
+      <td>${{ row.balance }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No matches.</p>
+{% endif %}
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Products</h2>
+<p><a href="/products/new" role="button">Add a product</a></p>
+<table>
+  <thead>
+    <tr><th></th><th>Name</th><th>Price</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for product in products %}
+    <tr>
+      <td><img class="thumb" src="/product-image/{{ product.image }}" alt="{{ product.name }}"></td>
+      <td>{{ product.name }}</td>
+      <td>${{ product.price }}</td>
+      <td><a href="/products/{{ product.id }}" role="button" class="secondary">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+

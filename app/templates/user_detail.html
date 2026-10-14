@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ user.username }}</h2>
+<p>Email: {{ user.email }}</p>
+<p>Balance: <strong>${{ user.balance }}</strong></p>
+<p>Shipping address:<br>{{ address_html | safe }}</p>
+
+<form action="/users/{{ user.username }}/reset_password" method="post" class="narrow">
+  <label for="new_password">Set a new password for this customer</label>
+  <input id="new_password" type="text" name="new_password"
+         placeholder="New password" autocomplete="off">
+  <button class="secondary" type="submit">Reset password</button>
+</form>
+
+<h2>Orders</h2>
+{% if orders %}
+<table>
+  <thead>
+    <tr><th>Order</th><th>Placed</th><th>Total</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      <td>#{{ order.id }}</td>
+      <td>{{ order.created_at }}</td>
+      <td>${{ order.total }}</td>
+      <td>{{ order.status }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No orders yet.</p>
+{% endif %}
+{% endblock %}
+

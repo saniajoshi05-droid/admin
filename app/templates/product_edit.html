@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit product</h2>
+<form action="/products/{{ product.id }}" method="post" class="narrow">
+  <label for="image">Photo file</label>
+  <input id="image" type="text" name="image" value="{{ product.image }}">
+  <small class="muted">The name of the photo to use, e.g. toaster.jpg</small>
+  <label for="name">Name</label>
+  <input id="name" type="text" name="name" value="{{ product.name }}">
+  <label for="description">Description</label>
+  <textarea id="description" name="description" rows="3">{{ product.description }}</textarea>
+  <label for="price">Price</label>
+  <input id="price" type="number" name="price" value="{{ product.price }}">
+  <button type="submit">Save</button>
+</form>
+{% endblock %}
+

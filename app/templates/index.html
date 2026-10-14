@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<div class="cards">
+  <article><span class="n">{{ counts.products }}</span><span class="label">Products</span></article>
+  <article><span class="n">{{ counts.users }}</span><span class="label">Customers</span></article>
+  <article><span class="n">{{ counts.orders }}</span><span class="label">Orders</span></article>
+</div>
+<h2>Recent orders</h2>
+{% if recent_orders %}
+<table>
+  <thead>
+    <tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Placed</th></tr>
+  </thead>
+  <tbody>
+    {% for order in recent_orders %}
+    <tr>
+      <td>#{{ order.id }}</td>
+      <td><a href="/users/{{ order.username }}">{{ order.username }}</a></td>
+      <td>${{ order.total }}</td>
+      <td>{{ order.status }}</td>
+      <td>{{ order.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">No orders yet.</p>
+{% endif %}
+{% endblock %}
+

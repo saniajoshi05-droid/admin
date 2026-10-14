@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add a product</h2>
+<form action="/products/new" method="post" class="narrow" enctype="multipart/form-data" id="new-product-form">
+  <label for="photo">Photo</label>
+  <input id="photo" type="file" name="photo" accept="image/*">
+  <small class="muted">
+    Uploaded photos are resized automatically. Filenames may only contain
+    letters, numbers, dots, dashes, and underscores.
+  </small>
+  <label for="name">Name</label>
+  <input id="name" type="text" name="name">
+  <label for="description">Description</label>
+  <textarea id="description" name="description" rows="3"></textarea>
+  <label for="price">Price</label>
+  <input id="price" type="number" name="price">
+  <button type="submit">Add product</button>
+</form>
+<script>
+  // Make sure this is a valid filename, to prevent admins uploading
+  // files with spaces or other characters that would break the service.
+  document.getElementById("new-product-form").addEventListener("submit", function (e) {
+    var input = document.getElementById("photo");
+    var file = input.files[0];
+    if (file && !/^[A-Za-z0-9._-]+$/.test(file.name)) {
+      alert("Photo filenames may only contain letters, numbers, dots, dashes, and underscores.");
+      // Prevent the form from being submitted.
+      e.preventDefault();
+    }
+  });
+</script>
+{% endblock %}
+

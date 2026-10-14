@@ -1,0 +1,68 @@
+/* The admin dashboard's own styles, on top of Pico.
+ *
+ * Deliberately close to the storefront's main.css — it's the same business,
+ * and students move between the two constantly during exam 2. The difference
+ * is the stat tiles, which the shop has no use for.
+ */
+
+/* The colored band across the top. `--brand` / `--brand-text` come from the
+ * store builder and are set inline in base.html. */
+.brand-bar {
+    background: var(--brand);
+    margin-bottom: 2rem;
+}
+
+.brand-bar h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.brand-bar a {
+    color: var(--brand-text);
+    text-decoration: none;
+}
+
+.brand-bar a:hover {
+    text-decoration: underline;
+}
+
+/* The counts across the top of the dashboard. */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.cards article {
+    margin: 0;
+    text-align: center;
+}
+
+.cards .n {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.cards .label {
+    font-size: 0.85rem;
+    color: var(--pico-muted-color);
+}
+
+.thumb {
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+
+.muted {
+    color: var(--pico-muted-color);
+}
+
+.narrow {
+    max-width: 30rem;
+}
+
