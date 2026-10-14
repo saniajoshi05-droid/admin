@@ -3,7 +3,8 @@
 <h2>{{ user.username }}</h2>
 <p>Email: {{ user.email }}</p>
 <p>Balance: <strong>${{ user.balance }}</strong></p>
-<p>Shipping address:<br>{{ address_html | safe }}</p>
+<p>Shipping address:</p>
+<p style="white-space: pre-line">{{ user.address }}</p>
 
 <form action="/users/{{ user.username }}/reset_password" method="post" class="narrow">
   <label for="new_password">Set a new password for this customer</label>
