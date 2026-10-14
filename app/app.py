@@ -1,13 +1,19 @@
 import logging
 import mimetypes
 import os
+import secrets
 import subprocess
 import tempfile
 
 from flask import Flask, Response, redirect, render_template, request, session
+from werkzeug.utils import secure_filename
 
 import config
 import db
+
+# Image types we accept for product photos. Used to validate uploads before
+# they are written to disk or passed to the image resizer.
+ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 # Boilerplate to set up the web server and logger.
 # Server logs are written to /root/admin.log.
@@ -105,10 +111,22 @@ def product_new_get():
 
 
 def save_product_photo(photo):
-    """Saves a new product photo to the disk, if an admin creates one."""
+    """Saves a new product photo to the disk, if an admin creates one.
+
+    Returns the stored filename, or None if the upload is not a supported
+    image type.
+    """
     # Create the directory to save the photo, if it doesn't already exist
     os.makedirs(PRODUCT_IMAGE_DIR, exist_ok=True)
-    filename = photo.filename
+
+    # Never trust the uploaded filename for building a path or a command.
+    # Validate the extension and generate our own random, safe filename.
+    ext = os.path.splitext(secure_filename(photo.filename))[1].lower()
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        log.warning("rejected photo upload with unsupported type %r by %s",
+                    photo.filename, require_admin())
+        return None
+    filename = secrets.token_hex(16) + ext
 
     log.info("product photo %s uploaded by %s", filename, require_admin())
 
@@ -120,9 +138,14 @@ def save_product_photo(photo):
 
     # Resize the photo to 512x512 pixels, the size every product photo in the
     # shop uses, so the grid stays even.
-    # This uses the imagemagick convert tool to do the resizing.
+    # This uses the imagemagick convert tool to do the resizing. The command is
+    # passed as an argument list (no shell), so filenames can never be
+    # interpreted as shell commands.
     resized_photo_path = os.path.join(PRODUCT_IMAGE_DIR, filename)
-    subprocess.getoutput(f"convert {tmp_path} -resize 512x512 {resized_photo_path}")
+    subprocess.run(
+        ["convert", tmp_path, "-resize", "512x512", resized_photo_path],
+        check=True,
+    )
 
     # Delete the original photo
     os.remove(tmp_path)
@@ -162,7 +185,9 @@ def product_new_post():
 
     photo = request.files.get("photo")
     if photo and photo.filename:
-        image = save_product_photo(photo) 
+        image = save_product_photo(photo)
+        if image is None:
+            return render_template("error.html", error="Unsupported image type")
     else:
         image = ""
 
@@ -238,15 +263,15 @@ def user_detail(username):
     orders = db.query(
         "SELECT * FROM orders WHERE username = %s ORDER BY id DESC", (username,)
     )
-    # Replace "\n" characters with HTML <br> tags so they actually display as newlines.
-    address_html = (user["address"] or "").replace("\n", "<br>")
 
     log.info("customer record %s opened by %s, ship-to %s",
              username, require_admin(), user["address"])
 
-    return render_template(
-        "user_detail.html", user=user, orders=orders, address_html=address_html
-    )
+    # The address is rendered with normal auto-escaping in the template, with
+    # newlines preserved via CSS (white-space: pre-line). We no longer build an
+    # "HTML" version here, since marking customer-supplied data | safe allowed
+    # stored XSS.
+    return render_template("user_detail.html", user=user, orders=orders)
 
 
 @app.route("/users/<username>/reset_password", methods=["POST"])
@@ -288,9 +313,11 @@ def search():
     results = []
     if query:
         log.info("customer search for %s by %s", query, require_admin())
+        like = f"%{query}%"
         results = db.query(
             "SELECT username, email, address, balance FROM users WHERE "
-            f"username LIKE '%{query}%' OR email LIKE '%{query}%' OR address LIKE '%{query}%'"
+            "username LIKE %s OR email LIKE %s OR address LIKE %s",
+            (like, like, like),
         )
     return render_template("search.html", query=query, results=results)
 
@@ -313,8 +340,8 @@ def login_post():
     log.info("admin login attempt for %s", username)
 
     admin = db.query_one(
-        "SELECT * FROM admin_users WHERE username = "
-        f"'{username}' AND password = '{password}'"
+        "SELECT * FROM admin_users WHERE username = %s AND password = %s",
+        (username, password),
     )
     if admin is None:
         return render_template("error.html", error="Invalid username or password")
